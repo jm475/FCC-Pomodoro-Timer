@@ -5,20 +5,19 @@ import './App.css'
 function App() {
   /* 
    There is an issue when in break mode
-    - Increasing session length will increase the timer if the current mode is in break
-  
-  
    */
 
   
   const [timerRunning, setTimerRunning] = useState(false);
-  const [timerValue, setTimerValue] = useState(1500); // Default is 1500 seconds
+  const [timerValue, setTimerValue] = useState(1); // Default is 1500 seconds
   const [startStopButton, setStartStopButton] = useState('Start');
   const [breakLength, setBreakLength] = useState(300); // Default is 300 seconds
   const [sessionLength, setSessionLength] = useState(1500); // Default is 1500 seconds
-  const [sessionOrBreak, setSessionOrBreak] = useState('Session');
+  const [sessionOrBreak, setSessionOrBreak] = useState('Pomodoro');
   const intervalRef = useRef(null);
   const audio = useRef();
+  const incrementIntervalRef = useRef(null); // Reference when button is being held
+  const decrementIntervalRef = useRef(null); // Reference when button is being held
   
   // Function to convert seconds to mm:ss format
   const convertSecondsToMMSS = (timerValue) => {
@@ -54,7 +53,7 @@ function App() {
    
   // Function to handle increase session length button
   const increaseSessionLength = () => {
-    if(sessionLength >= 3600 || timerRunning === true) {
+    if(sessionLength >= 3600 || timerRunning === true || sessionOrBreak === 'Break') {
        return;
      }
     setSessionLength(prevSessionLength => prevSessionLength + 60);
@@ -64,11 +63,14 @@ function App() {
   
   // Function to handle decrease session length button
   const decreaseSessionLength = () => {
-    if(sessionLength <= 60 || timerRunning === true) {
+    if(sessionLength <= 60 || timerRunning === true || sessionOrBreak === 'Break') {
        return;
      } 
     setSessionLength(prevSessionLength => prevSessionLength - 60);
     setTimerValue(prevTimerValue => prevTimerValue - 60);
+
+    // Logging session length
+  console.log(sessionLength);
   }
    
  
@@ -80,6 +82,10 @@ function App() {
       stopTimer();
     }
   };
+
+
+
+
 
   // Function to start the timer
   const startTimer = () => {
@@ -104,7 +110,7 @@ function App() {
     setTimerValue(1500);
     setBreakLength(300);
     setSessionLength(1500);
-    setSessionOrBreak('Session');
+    setSessionOrBreak('Pomodoro');
   };
 
   // Function to act as a timer to count the time down on the clock
@@ -114,7 +120,7 @@ function App() {
 
     // Run the timer effect 
   useEffect(() => {
-     if (timerValue === 0 && sessionOrBreak === 'Session') {
+     if (timerValue === 0 && sessionOrBreak === 'Pomodoro') {
         stopTimer(); 
         audio.current.currentTime = 0;
         audio.current.play();
@@ -125,15 +131,24 @@ function App() {
         stopTimer(); 
         audio.current.currentTime = 0;
         audio.current.play();
-        setSessionOrBreak('Session');
+        setSessionOrBreak('Pomodoro');
         setTimerValue(sessionLength);
         startTimer();
      }
   }, [timerValue, sessionOrBreak, breakLength]);
  
-  // Run the color effect
+  // Run the color effects
   useEffect(() => {
-  document.body.style.color = sessionOrBreak === 'Session' ? '#FF3366' : '#9C6EAF';
+  document.body.style.color = sessionOrBreak === 'Pomodoro' ? '#FF3366' : '#9C6EAF';
+  document.getElementById('start_stop').style.color = sessionOrBreak === 'Pomodoro' ? '#FF3366' : '#9C6EAF';
+  
+  const inputs = document.querySelectorAll('input[type="number"]');
+
+// Loop through each input element
+inputs.forEach(input => {
+    // Change color based on condition
+    input.style.color = sessionOrBreak === 'Pomodoro' ? '#FF3366' : '#9C6EAF';
+});
 }, [sessionOrBreak]);
   
   
@@ -151,21 +166,95 @@ function App() {
       
       <div id="adjust-section">
          <div id="break-section">
-          <p id="break-label">Break Length</p>
-          <p id="break-length">{convertSecondsToMinutes(breakLength)}</p>
-           <div id="break-buttons">
+          {/* <p id="break-label">Break Length</p>
+          <p id="break-length">{convertSecondsToMinutes(breakLength)}</p> */}
+          <label htmlFor="break-length">Break Length</label>
+          <div className="session-length-input">
+  <input 
+    type="number" 
+    id="break-length" 
+    name="-break-length" 
+    value={convertSecondsToMinutes(breakLength)} // Use sessionLength variable here
+    min="1" 
+    max="999" 
+    step="1" 
+    onChange={(e) => {
+      if(timerRunning === true || sessionOrBreak === 'Session') {
+        return;
+      } 
+      let newValue = parseInt(e.target.value);
+      if (newValue > 999) {
+        e.target.value = 999;
+      } else if (newValue < 1) {
+        e.target.value = 5;
+      }
+    
+      const newBreakLength = parseInt(e.target.value) * 60; // Calculate new session length
+      setBreakLength(newBreakLength); // Update sessionLength state
+      // setTimerValue(newBreakLength); // Update timerValue state
+    }} 
+
+    onBlur={(e) => {
+      if (!e.target.value) {
+        setSessionLength(25 * 60); // Default session length to 25 minutes if input is empty
+        setTimerValue(25 * 60); // Update timerValue state accordingly
+      }
+    }} // Default session length to 25 if input is empty on blur
+    
+  />
+</div>
+           {/* <div id="break-buttons">
              <a id="break-increment" onClick={increaseBreakLength}><i class="bi bi-arrow-up-circle-fill"></i></a>
              <a id="break-decrement" onClick={decreaseBreakLength}><i class="bi bi-arrow-down-circle-fill"></i></a>
-           </div>
+           </div> */}
         </div>
         
         <div id="session-section">      
-          <p id="session-label">Session Length</p>
-          <p id="session-length">{convertSecondsToMinutes(sessionLength)}</p>
-          <div id="session-buttons">
-             <a id="session-increment" onClick={increaseSessionLength}><i class="bi bi-arrow-up-circle-fill"></i></a>
-           <a id="session-decrement" onClick={decreaseSessionLength}><i class="bi bi-arrow-down-circle-fill"></i></a>
-          </div>
+          {/* <p id="session-label">Session Length</p>
+          <p id="session-length">{convertSecondsToMinutes(sessionLength)}</p> */}
+        <label htmlFor="session-length">Session Length</label>
+<div className="session-length-input">
+  <input 
+    type="number" 
+    id="session-length" 
+    name="session-length" 
+    value={convertSecondsToMinutes(sessionLength)} // Use sessionLength variable here
+    min="1" 
+    max="999" 
+    step="1" 
+    onChange={(e) => {
+      if(timerRunning === true || sessionOrBreak === 'Break') {
+        return;
+      } 
+      let newValue = parseInt(e.target.value);
+      if (newValue > 999) {
+        e.target.value = 999;
+      } else if (newValue < 1) {
+        e.target.value = 25;
+      }
+    
+      const newSessionLength = parseInt(e.target.value) * 60; // Calculate new session length
+      setSessionLength(newSessionLength); // Update sessionLength state
+      setTimerValue(newSessionLength); // Update timerValue state
+    }} 
+
+    onBlur={(e) => {
+      if (!e.target.value) {
+        setbreakLength(25 * 60); // Default session length to 25 minutes if input is empty
+        // setTimerValue(25 * 60); // Update timerValue state accordingly
+      }
+    }} // Default session length to 25 if input is empty on blur
+    
+  />
+</div>
+
+
+          {/* <div id="session-buttons">
+             <a id="session-increment"  
+             ><i class="bi bi-arrow-up-circle-fill"></i></a>
+           <a id="session-decrement" 
+           ><i class="bi bi-arrow-down-circle-fill"></i></a>
+          </div> */}
         </div>
       </div>
     </div>
