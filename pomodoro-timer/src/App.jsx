@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import './App.css'
+import Modal from './Modal';
 
 
 function App() {
@@ -12,13 +13,13 @@ function App() {
   const [timerValue, setTimerValue] = useState(1); // Default is 1500 seconds
   const [startStopButton, setStartStopButton] = useState('Start');
   const [breakLength, setBreakLength] = useState(300); // Default is 300 seconds
+  const [longBreakLength, setlongBreakLength] = useState(600); // Default is 300 seconds
   const [sessionLength, setSessionLength] = useState(1500); // Default is 1500 seconds
   const [sessionOrBreak, setSessionOrBreak] = useState('Pomodoro');
+  const [showModal, setShowModal]= useState(false);
   const intervalRef = useRef(null);
   const audio = useRef();
-  const incrementIntervalRef = useRef(null); // Reference when button is being held
-  const decrementIntervalRef = useRef(null); // Reference when button is being held
-  
+
   // Function to convert seconds to mm:ss format
   const convertSecondsToMMSS = (timerValue) => {
     const minutes = Math.floor(timerValue / 60);
@@ -141,7 +142,7 @@ function App() {
   useEffect(() => {
   document.body.style.color = sessionOrBreak === 'Pomodoro' ? '#FF3366' : '#9C6EAF';
   document.getElementById('start_stop').style.color = sessionOrBreak === 'Pomodoro' ? '#FF3366' : '#9C6EAF';
-  
+
   const inputs = document.querySelectorAll('input[type="number"]');
 
 // Loop through each input element
@@ -154,26 +155,48 @@ inputs.forEach(input => {
   
   return (
     <div id="app">
-      <div id="clock-section">
-        <audio id="beep" ref={audio} src="https://raw.githubusercontent.com/freeCodeCamp/cdn/master/build/testable-projects-fcc/audio/BeepSound.wav"></audio>
-        <div id="clock">
-          <div id="timer-label">{sessionOrBreak}</div>
-        <div id="time-left">{convertSecondsToMMSS(timerValue)}</div>
-        <button id="start_stop" onClick={startStopButtonPress}>{startStopButton}</button>
-        <a id="reset" onClick={resetButtonPress}><i class="bi bi-arrow-clockwise"></i></a>
+        <div id="clock-section">
+          <audio id="beep" ref={audio} src="https://raw.githubusercontent.com/freeCodeCamp/cdn/master/build/testable-projects-fcc/audio/BeepSound.wav"></audio>
+          <div id="clock">
+            <div id="clock-labels">
+              <a><div id="timer-label">{sessionOrBreak}</div></a>
+              <a><div id="shortBreak-label">Short Break</div></a>
+              <a><div id="longBreak-label">Long Break</div></a>
+            </div>
+          <div id="time-left">{convertSecondsToMMSS(timerValue)}</div>
+          <button id="start_stop" onClick={startStopButtonPress}>{startStopButton}</button>
+          <div id="clock-buttons">
+            <a id="reset" onClick={resetButtonPress}><i class="bi bi-arrow-repeat"></i></a>
+            <a id="settings" onClick={() => setShowModal(true)}><i class="bi bi-gear-fill"></i></a>
+            
+            {/* Pass props to Modal component */}
+            {showModal && <Modal
+              showModal={showModal}
+              setShowModal={setShowModal}
+              convertSectoMin={convertSecondsToMinutes}
+              timerValue={timerValue}
+              sessionLength={sessionLength}
+              setSessionLength={setSessionLength}
+              breakLength={breakLength}
+              setBreakLength={setBreakLength}
+              longBreakLength={longBreakLength} 
+              setlongBreakLength={longBreakLength}
+              timerRunning={timerRunning}
+              sessionOrBreak={sessionOrBreak}
+            />}
+          </div>
+          
         </div>
       </div>
       
       <div id="adjust-section">
-         <div id="break-section">
-          {/* <p id="break-label">Break Length</p>
-          <p id="break-length">{convertSecondsToMinutes(breakLength)}</p> */}
+        <div id="break-section">
           <label htmlFor="break-length">Break Length</label>
-          <div className="session-length-input">
+        <div>
   <input 
     type="number" 
     id="break-length" 
-    name="-break-length" 
+    name="break-length" 
     value={convertSecondsToMinutes(breakLength)} // Use sessionLength variable here
     min="1" 
     max="999" 
@@ -189,31 +212,24 @@ inputs.forEach(input => {
         e.target.value = 5;
       }
     
-      const newBreakLength = parseInt(e.target.value) * 60; // Calculate new session length
-      setBreakLength(newBreakLength); // Update sessionLength state
-      // setTimerValue(newBreakLength); // Update timerValue state
+      const newBreakLength = parseInt(e.target.value) * 60; // Calculate new break length
+      setBreakLength(newBreakLength); // Update BreakLength state
     }} 
 
     onBlur={(e) => {
       if (!e.target.value) {
-        setSessionLength(25 * 60); // Default session length to 25 minutes if input is empty
-        setTimerValue(25 * 60); // Update timerValue state accordingly
+        setBreakLength(5 * 60); // Default break length to 5 minutes if input is empty
+        // setTimerValue(25 * 60); // Update timerValue state accordingly
       }
-    }} // Default session length to 25 if input is empty on blur
+    }} // Default break length to 55 if input is empty on blur
     
   />
 </div>
-           {/* <div id="break-buttons">
-             <a id="break-increment" onClick={increaseBreakLength}><i class="bi bi-arrow-up-circle-fill"></i></a>
-             <a id="break-decrement" onClick={decreaseBreakLength}><i class="bi bi-arrow-down-circle-fill"></i></a>
-           </div> */}
         </div>
         
         <div id="session-section">      
-          {/* <p id="session-label">Session Length</p>
-          <p id="session-length">{convertSecondsToMinutes(sessionLength)}</p> */}
         <label htmlFor="session-length">Session Length</label>
-<div className="session-length-input">
+<div>
   <input 
     type="number" 
     id="session-length" 
@@ -241,7 +257,7 @@ inputs.forEach(input => {
     onBlur={(e) => {
       if (!e.target.value) {
         setbreakLength(25 * 60); // Default session length to 25 minutes if input is empty
-        // setTimerValue(25 * 60); // Update timerValue state accordingly
+        
       }
     }} // Default session length to 25 if input is empty on blur
     
