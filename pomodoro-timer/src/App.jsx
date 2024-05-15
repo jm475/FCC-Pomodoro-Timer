@@ -10,11 +10,12 @@ function App() {
 
   
   const [timerRunning, setTimerRunning] = useState(false);
-  const [timerValue, setTimerValue] = useState(1); // Default is 1500 seconds
+  const [timerValue, setTimerValue] = useState(1500); // Default is 1500 seconds
   const [startStopButton, setStartStopButton] = useState('Start');
   const [breakLength, setBreakLength] = useState(300); // Default is 300 seconds
   const [longBreakLength, setlongBreakLength] = useState(600); // Default is 300 seconds
   const [sessionLength, setSessionLength] = useState(1500); // Default is 1500 seconds
+  // Three possible values "Pomodoro", "Break", "LongBreak"
   const [sessionOrBreak, setSessionOrBreak] = useState('Pomodoro');
   const [showModal, setShowModal]= useState(false);
   const intervalRef = useRef(null);
@@ -136,12 +137,16 @@ function App() {
         setTimerValue(sessionLength);
         startTimer();
      }
+
+     // Change the document title to display the current time.
+     document.title = convertSecondsToMMSS(timerValue);
+
   }, [timerValue, sessionOrBreak, breakLength]);
  
-  // Run the color effects
+  // Run the color effects on the elements
   useEffect(() => {
-  document.body.style.color = sessionOrBreak === 'Pomodoro' ? '#FF3366' : '#9C6EAF';
-  document.getElementById('start_stop').style.color = sessionOrBreak === 'Pomodoro' ? '#FF3366' : '#9C6EAF';
+  document.body.style.color = sessionOrBreak === 'Pomodoro' ? '#FF3366' : (sessionOrBreak === 'Break' ? '#9C6EAF' : '#28AFB0');
+  document.getElementById('start_stop').style.color = sessionOrBreak === 'Pomodoro' ? '#FF3366' : (sessionOrBreak === 'Break' ? '#9C6EAF' : '#28AFB0');
 
   const inputs = document.querySelectorAll('input[type="number"]');
 
@@ -159,9 +164,12 @@ inputs.forEach(input => {
           <audio id="beep" ref={audio} src="https://raw.githubusercontent.com/freeCodeCamp/cdn/master/build/testable-projects-fcc/audio/BeepSound.wav"></audio>
           <div id="clock">
             <div id="clock-labels">
-              <a><div id="timer-label">{sessionOrBreak}</div></a>
-              <a><div id="shortBreak-label">Short Break</div></a>
-              <a><div id="longBreak-label">Long Break</div></a>
+              <a class={sessionOrBreak === 'Pomodoro' ? 'label-selected' : 'label-not-selected'} 
+                 onClick={() => setSessionOrBreak("Pomodoro")}><div id="pomodoro-label">Pomodoro</div></a>
+              <a class={sessionOrBreak === 'Break' ? 'label-selected' : 'label-not-selected'} 
+                 onClick={() => setSessionOrBreak("Break")}><div id="shortBreak-label">Short Break</div></a>
+              <a class={sessionOrBreak === 'longBreak' ? 'label-selected' : 'label-not-selected'}
+                 onClick={() => setSessionOrBreak("longBreak")}><div id="longBreak-label">Long Break</div></a>
             </div>
           <div id="time-left">{convertSecondsToMMSS(timerValue)}</div>
           <button id="start_stop" onClick={startStopButtonPress}>{startStopButton}</button>
@@ -186,91 +194,6 @@ inputs.forEach(input => {
             />}
           </div>
           
-        </div>
-      </div>
-      
-      <div id="adjust-section">
-        <div id="break-section">
-          <label htmlFor="break-length">Break Length</label>
-        <div>
-  <input 
-    type="number" 
-    id="break-length" 
-    name="break-length" 
-    value={convertSecondsToMinutes(breakLength)} // Use sessionLength variable here
-    min="1" 
-    max="999" 
-    step="1" 
-    onChange={(e) => {
-      if(timerRunning === true || sessionOrBreak === 'Session') {
-        return;
-      } 
-      let newValue = parseInt(e.target.value);
-      if (newValue > 999) {
-        e.target.value = 999;
-      } else if (newValue < 1) {
-        e.target.value = 5;
-      }
-    
-      const newBreakLength = parseInt(e.target.value) * 60; // Calculate new break length
-      setBreakLength(newBreakLength); // Update BreakLength state
-    }} 
-
-    onBlur={(e) => {
-      if (!e.target.value) {
-        setBreakLength(5 * 60); // Default break length to 5 minutes if input is empty
-        // setTimerValue(25 * 60); // Update timerValue state accordingly
-      }
-    }} // Default break length to 55 if input is empty on blur
-    
-  />
-</div>
-        </div>
-        
-        <div id="session-section">      
-        <label htmlFor="session-length">Session Length</label>
-<div>
-  <input 
-    type="number" 
-    id="session-length" 
-    name="session-length" 
-    value={convertSecondsToMinutes(sessionLength)} // Use sessionLength variable here
-    min="1" 
-    max="999" 
-    step="1" 
-    onChange={(e) => {
-      if(timerRunning === true || sessionOrBreak === 'Break') {
-        return;
-      } 
-      let newValue = parseInt(e.target.value);
-      if (newValue > 999) {
-        e.target.value = 999;
-      } else if (newValue < 1) {
-        e.target.value = 25;
-      }
-    
-      const newSessionLength = parseInt(e.target.value) * 60; // Calculate new session length
-      setSessionLength(newSessionLength); // Update sessionLength state
-      setTimerValue(newSessionLength); // Update timerValue state
-    }} 
-
-    onBlur={(e) => {
-      if (!e.target.value) {
-        setbreakLength(25 * 60); // Default session length to 25 minutes if input is empty
-        
-      }
-    }} // Default session length to 25 if input is empty on blur
-    
-  />
-</div>
-
-
-          {/* <div id="session-buttons">
-             <a id="session-increment"  
-             ><i class="bi bi-arrow-up-circle-fill"></i></a>
-           <a id="session-decrement" 
-           ><i class="bi bi-arrow-down-circle-fill"></i></a>
-          </div> */}
         </div>
       </div>
     </div>

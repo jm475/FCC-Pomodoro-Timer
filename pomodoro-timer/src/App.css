@@ -6,6 +6,7 @@
   --Purple: #59305F;
   --Amethyst: #9C6EAF;
   --Foly: #FF3366;
+  --White: #EDEDF4;
   /* LINK TO COLORS: https://coolors.co/0e0e12-1f1f1c-2a2338-ff3366-9c6eaf */
 }
 
@@ -44,6 +45,8 @@ body {
    font-size: 3rem;
 }
 
+
+/* Pomodoro Short Break Long Break */
 #clock-labels {
   display: flex;
   font-size: 2rem;
@@ -51,7 +54,9 @@ body {
   flex-direction: row;
   gap: 4rem;
   margin-bottom: 2rem;
+  align-items: center;
 }
+
 
 #clock-buttons {
   font-size: 2rem;
@@ -60,6 +65,10 @@ body {
   gap: 2rem;
 }
 
+
+#pomodoro-label {
+  color: var(--Foly)
+}
 
 
 #shortBreak-label {
@@ -70,24 +79,38 @@ body {
   color:var(--Verdigris)
 }
 
+/* Class for when a label is selected */
+.label-selected {
+  background-color: #1c1c2e;
+  border-radius: 5px;
+  padding: 0 2rem 0 2rem
+}
+
+/* Class for when a label is selected */
+.label-not-selected {
+  background-color: transparent;
+}
 
 #time-left {
   font-size: 5rem;
   font-weight: 900;
   background-color: #1c1c2e;
   padding: 0 5rem;
-  margin-bottom: 0.5rem;
+  margin-bottom: 1.5rem;
 }
 
 #start_stop {
   font-size: 1.5rem;
   font-weight: bold;
   font-family: "Mukta Mahee", sans-serif;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
   color: var(--Foly);
   border: 0;
   border-radius: 5px;
   min-width: 8rem;
+  background-color: #EDEDF4;
+  box-shadow: 0px 2px 1px 2px;
+  
 }
 
 #start_stop:hover, a:hover {
@@ -95,34 +118,8 @@ body {
   cursor: pointer;
 }
 
-#break-section {
-  display: block;
-  text-align: center;
-  font-size: 2.5rem;
-}
-
-#session-section {
-  display: block;
-  text-align: center;
-  font-size: 2.5rem;
-}
-
-
-#session-increment, #break-increment {
-  margin-right: 2rem;
-}
-
-
-#session-buttons, #break-buttons{
-  font-size: 2rem;
-}
-
-
-#adjust-section {
-  display: grid;
-  grid-template-columns: auto auto;
-  width: 100vw;
-  background-color: #0E0E12;
+#start_stop:active{
+  transform: translateY(4px);
 }
 
 
