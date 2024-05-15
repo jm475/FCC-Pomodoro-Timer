@@ -2,15 +2,21 @@
   --night: #0E0E12;
   --eerieBlack: #1F1F1C;
   --raisinBlack: #302E38;
-  --darkPurple: #2A2338;
-  --purple: #59305F;
+  --Verdigris: #28AFB0;
+  --Purple: #59305F;
   --Amethyst: #9C6EAF;
   --Foly: #FF3366;
+  --White: #EDEDF4;
   /* LINK TO COLORS: https://coolors.co/0e0e12-1f1f1c-2a2338-ff3366-9c6eaf */
 }
 
 * {
   margin: 0;
+}
+
+html {
+  min-height: 100vh;
+  min-width: 100vw;
 }
 
 body {
@@ -19,11 +25,11 @@ body {
   background-color: #0E0E12;
 }
 
-
 #app {
   display: block;
   justify-content: center;
   align-items: center;
+  margin-top: 5rem;
 }
 
 #clock-section {
@@ -36,12 +42,53 @@ body {
    flex-direction: column;
    align-items: center;
 /*    margin-top: 15%; */
-   font-size: 2rem;
+   font-size: 3rem;
 }
 
-#timer-label {
+
+/* Pomodoro Short Break Long Break */
+#clock-labels {
+  display: flex;
+  font-size: 2rem;
   font-weight: 900;
-  font-size: 4rem;
+  flex-direction: row;
+  gap: 4rem;
+  margin-bottom: 2rem;
+  align-items: center;
+}
+
+
+#clock-buttons {
+  font-size: 2rem;
+  display: flex;
+  flex-direction: row;
+  gap: 2rem;
+}
+
+
+#pomodoro-label {
+  color: var(--Foly)
+}
+
+
+#shortBreak-label {
+  color:var(--Amethyst);
+}
+
+#longBreak-label {
+  color:var(--Verdigris)
+}
+
+/* Class for when a label is selected */
+.label-selected {
+  background-color: #1c1c2e;
+  border-radius: 5px;
+  padding: 0 2rem 0 2rem
+}
+
+/* Class for when a label is selected */
+.label-not-selected {
+  background-color: transparent;
 }
 
 #time-left {
@@ -49,18 +96,21 @@ body {
   font-weight: 900;
   background-color: #1c1c2e;
   padding: 0 5rem;
-  margin-bottom: 0.5rem;
+  margin-bottom: 1.5rem;
 }
 
 #start_stop {
   font-size: 1.5rem;
   font-weight: bold;
   font-family: "Mukta Mahee", sans-serif;
-  margin-bottom: 1rem;
-  color: #59305F;
+  margin-bottom: 1.5rem;
+  color: var(--Foly);
   border: 0;
   border-radius: 5px;
   min-width: 8rem;
+  background-color: #EDEDF4;
+  box-shadow: 0px 2px 1px 2px;
+  
 }
 
 #start_stop:hover, a:hover {
@@ -68,38 +118,28 @@ body {
   cursor: pointer;
 }
 
-#break-section {
-  display: block;
-  text-align: center;
-  margin-top: 1rem;
-  margin-left: 5rem;
-  font-size: 2.5rem;
-}
-
-#session-section {
-  display: block;
-  text-align: center;
-  margin-top: 1rem;
-  margin-right: 5rem;
-  font-size: 2.5rem;
+#start_stop:active{
+  transform: translateY(4px);
 }
 
 
-#session-increment, #break-increment {
-  margin-right: 2rem;
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  position: absolute;
+  top: 0%;
+  bottom: 0;
+  right: 0;
+  height: 100%;
+  
 }
 
-
-#session-buttons, #break-buttons, #reset {
+input[type=number] {
+  width: 5rem;
+  height: 30px;
+  text-align: left;
   font-size: 2rem;
+  color: var(--Foly);
+  background-color: var(--night);
+  border: 2px solid var(--eerieBlack);
+  border-radius: 5px;
 }
-
-
-#adjust-section {
-  display: flex;
-  justify-content: space-between;
-  width: 100vw;
-  background-color: #0E0E12;
-}
-
-

@@ -1,13 +1,11 @@
 import { useState, useRef, useEffect } from 'react'
 import './App.css'
+import Modal from './Modal';
 
 
 function App() {
   /* 
    There is an issue when in break mode
-    - Increasing session length will increase the timer if the current mode is in break
-  
-  
    */
 
   
@@ -15,11 +13,14 @@ function App() {
   const [timerValue, setTimerValue] = useState(1500); // Default is 1500 seconds
   const [startStopButton, setStartStopButton] = useState('Start');
   const [breakLength, setBreakLength] = useState(300); // Default is 300 seconds
+  const [longBreakLength, setlongBreakLength] = useState(600); // Default is 300 seconds
   const [sessionLength, setSessionLength] = useState(1500); // Default is 1500 seconds
-  const [sessionOrBreak, setSessionOrBreak] = useState('Session');
+  // Three possible values "Pomodoro", "Break", "LongBreak"
+  const [sessionOrBreak, setSessionOrBreak] = useState('Pomodoro');
+  const [showModal, setShowModal]= useState(false);
   const intervalRef = useRef(null);
   const audio = useRef();
-  
+
   // Function to convert seconds to mm:ss format
   const convertSecondsToMMSS = (timerValue) => {
     const minutes = Math.floor(timerValue / 60);
@@ -54,7 +55,7 @@ function App() {
    
   // Function to handle increase session length button
   const increaseSessionLength = () => {
-    if(sessionLength >= 3600 || timerRunning === true) {
+    if(sessionLength >= 3600 || timerRunning === true || sessionOrBreak === 'Break') {
        return;
      }
     setSessionLength(prevSessionLength => prevSessionLength + 60);
@@ -64,11 +65,14 @@ function App() {
   
   // Function to handle decrease session length button
   const decreaseSessionLength = () => {
-    if(sessionLength <= 60 || timerRunning === true) {
+    if(sessionLength <= 60 || timerRunning === true || sessionOrBreak === 'Break') {
        return;
      } 
     setSessionLength(prevSessionLength => prevSessionLength - 60);
     setTimerValue(prevTimerValue => prevTimerValue - 60);
+
+    // Logging session length
+  console.log(sessionLength);
   }
    
  
@@ -80,6 +84,10 @@ function App() {
       stopTimer();
     }
   };
+
+
+
+
 
   // Function to start the timer
   const startTimer = () => {
@@ -104,7 +112,7 @@ function App() {
     setTimerValue(1500);
     setBreakLength(300);
     setSessionLength(1500);
-    setSessionOrBreak('Session');
+    setSessionOrBreak('Pomodoro');
   };
 
   // Function to act as a timer to count the time down on the clock
@@ -114,7 +122,7 @@ function App() {
 
     // Run the timer effect 
   useEffect(() => {
-     if (timerValue === 0 && sessionOrBreak === 'Session') {
+     if (timerValue === 0 && sessionOrBreak === 'Pomodoro') {
         stopTimer(); 
         audio.current.currentTime = 0;
         audio.current.play();
@@ -125,47 +133,67 @@ function App() {
         stopTimer(); 
         audio.current.currentTime = 0;
         audio.current.play();
-        setSessionOrBreak('Session');
+        setSessionOrBreak('Pomodoro');
         setTimerValue(sessionLength);
         startTimer();
      }
+
+     // Change the document title to display the current time.
+     document.title = convertSecondsToMMSS(timerValue);
+
   }, [timerValue, sessionOrBreak, breakLength]);
  
-  // Run the color effect
+  // Run the color effects on the elements
   useEffect(() => {
-  document.body.style.color = sessionOrBreak === 'Session' ? '#FF3366' : '#9C6EAF';
+  document.body.style.color = sessionOrBreak === 'Pomodoro' ? '#FF3366' : (sessionOrBreak === 'Break' ? '#9C6EAF' : '#28AFB0');
+  document.getElementById('start_stop').style.color = sessionOrBreak === 'Pomodoro' ? '#FF3366' : (sessionOrBreak === 'Break' ? '#9C6EAF' : '#28AFB0');
+
+  const inputs = document.querySelectorAll('input[type="number"]');
+
+// Loop through each input element
+inputs.forEach(input => {
+    // Change color based on condition
+    input.style.color = sessionOrBreak === 'Pomodoro' ? '#FF3366' : '#9C6EAF';
+});
 }, [sessionOrBreak]);
   
   
   return (
     <div id="app">
-      <div id="clock-section">
-        <audio id="beep" ref={audio} src="https://raw.githubusercontent.com/freeCodeCamp/cdn/master/build/testable-projects-fcc/audio/BeepSound.wav"></audio>
-        <div id="clock">
-          <div id="timer-label">{sessionOrBreak}</div>
-        <div id="time-left">{convertSecondsToMMSS(timerValue)}</div>
-        <button id="start_stop" onClick={startStopButtonPress}>{startStopButton}</button>
-        <a id="reset" onClick={resetButtonPress}><i class="bi bi-arrow-clockwise"></i></a>
-        </div>
-      </div>
-      
-      <div id="adjust-section">
-         <div id="break-section">
-          <p id="break-label">Break Length</p>
-          <p id="break-length">{convertSecondsToMinutes(breakLength)}</p>
-           <div id="break-buttons">
-             <a id="break-increment" onClick={increaseBreakLength}><i class="bi bi-arrow-up-circle-fill"></i></a>
-             <a id="break-decrement" onClick={decreaseBreakLength}><i class="bi bi-arrow-down-circle-fill"></i></a>
-           </div>
-        </div>
-        
-        <div id="session-section">      
-          <p id="session-label">Session Length</p>
-          <p id="session-length">{convertSecondsToMinutes(sessionLength)}</p>
-          <div id="session-buttons">
-             <a id="session-increment" onClick={increaseSessionLength}><i class="bi bi-arrow-up-circle-fill"></i></a>
-           <a id="session-decrement" onClick={decreaseSessionLength}><i class="bi bi-arrow-down-circle-fill"></i></a>
+        <div id="clock-section">
+          <audio id="beep" ref={audio} src="https://raw.githubusercontent.com/freeCodeCamp/cdn/master/build/testable-projects-fcc/audio/BeepSound.wav"></audio>
+          <div id="clock">
+            <div id="clock-labels">
+              <a class={sessionOrBreak === 'Pomodoro' ? 'label-selected' : 'label-not-selected'} 
+                 onClick={() => setSessionOrBreak("Pomodoro")}><div id="pomodoro-label">Pomodoro</div></a>
+              <a class={sessionOrBreak === 'Break' ? 'label-selected' : 'label-not-selected'} 
+                 onClick={() => setSessionOrBreak("Break")}><div id="shortBreak-label">Short Break</div></a>
+              <a class={sessionOrBreak === 'longBreak' ? 'label-selected' : 'label-not-selected'}
+                 onClick={() => setSessionOrBreak("longBreak")}><div id="longBreak-label">Long Break</div></a>
+            </div>
+          <div id="time-left">{convertSecondsToMMSS(timerValue)}</div>
+          <button id="start_stop" onClick={startStopButtonPress}>{startStopButton}</button>
+          <div id="clock-buttons">
+            <a id="reset" onClick={resetButtonPress}><i class="bi bi-arrow-repeat"></i></a>
+            <a id="settings" onClick={() => setShowModal(true)}><i class="bi bi-gear-fill"></i></a>
+            
+            {/* Pass props to Modal component */}
+            {showModal && <Modal
+              showModal={showModal}
+              setShowModal={setShowModal}
+              convertSectoMin={convertSecondsToMinutes}
+              timerValue={timerValue}
+              sessionLength={sessionLength}
+              setSessionLength={setSessionLength}
+              breakLength={breakLength}
+              setBreakLength={setBreakLength}
+              longBreakLength={longBreakLength} 
+              setlongBreakLength={longBreakLength}
+              timerRunning={timerRunning}
+              sessionOrBreak={sessionOrBreak}
+            />}
           </div>
+          
         </div>
       </div>
     </div>
