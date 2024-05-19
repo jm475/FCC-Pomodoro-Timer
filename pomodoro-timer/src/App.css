@@ -121,25 +121,3 @@ body {
 #start_stop:active{
   transform: translateY(4px);
 }
-
-
-input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button {
-  position: absolute;
-  top: 0%;
-  bottom: 0;
-  right: 0;
-  height: 100%;
-  
-}
-
-input[type=number] {
-  width: 5rem;
-  height: 30px;
-  text-align: left;
-  font-size: 2rem;
-  color: var(--Foly);
-  background-color: var(--night);
-  border: 2px solid var(--eerieBlack);
-  border-radius: 5px;
-}

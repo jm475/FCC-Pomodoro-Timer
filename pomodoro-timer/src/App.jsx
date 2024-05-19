@@ -13,8 +13,8 @@ function App() {
   const [timerValue, setTimerValue] = useState(1500); // Default is 1500 seconds
   const [startStopButton, setStartStopButton] = useState('Start');
   const [breakLength, setBreakLength] = useState(300); // Default is 300 seconds
-  const [longBreakLength, setlongBreakLength] = useState(600); // Default is 300 seconds
-  const [sessionLength, setSessionLength] = useState(1500); // Default is 1500 seconds
+  const [longBreakLength, setlongBreakLength] = useState(600); // Default is 600 seconds
+  const [sessionLength, setSessionLength] = useState(1); // Default is 1500 seconds
   // Three possible values "Pomodoro", "Break", "LongBreak"
   const [sessionOrBreak, setSessionOrBreak] = useState('Pomodoro');
   const [showModal, setShowModal]= useState(false);
@@ -86,9 +86,6 @@ function App() {
   };
 
 
-
-
-
   // Function to start the timer
   const startTimer = () => {
     setTimerRunning(true);
@@ -108,11 +105,18 @@ function App() {
     stopTimer(); // Stop the timer before resetting
     audio.current.pause(); // Pause the audio if its running
     audio.current.currentTime = 0; // Reset the audio to the start
-    // Reset timer values
-    setTimerValue(1500);
-    setBreakLength(300);
-    setSessionLength(1500);
-    setSessionOrBreak('Pomodoro');
+    //Reset timer values
+    if(sessionOrBreak === 'Pomodoro') {
+      setSessionLength(1500);
+      setTimerValue(sessionLength);
+    } else if (sessionOrBreak === 'Break') {
+      setBreakLength(300);
+      setTimerValue(breakLength);
+    } else {
+      setlongBreakLength(600);
+      setTimerValue(longBreakLength);
+    }
+    //setSessionOrBreak('Pomodoro');
   };
 
   // Function to act as a timer to count the time down on the clock
@@ -122,39 +126,47 @@ function App() {
 
     // Run the timer effect 
   useEffect(() => {
+    // If the timer hits zero and the current mode is "Pomodoro"
      if (timerValue === 0 && sessionOrBreak === 'Pomodoro') {
         stopTimer(); 
         audio.current.currentTime = 0;
         audio.current.play();
         setSessionOrBreak('Break');
         setTimerValue(breakLength);
-        startTimer();
+        //startTimer();
+    // If the timer hits zero and the current mode is "Break"
      } else if(timerValue === 0 && sessionOrBreak === 'Break') {
         stopTimer(); 
         audio.current.currentTime = 0;
         audio.current.play();
         setSessionOrBreak('Pomodoro');
         setTimerValue(sessionLength);
-        startTimer();
+        //startTimer();
      }
 
+     // If the timer isnt running refresh the timer value
+     if (!timerRunning) {
+      if (sessionOrBreak === 'Pomodoro') {
+        setTimerValue(sessionLength);
+      } else if (sessionOrBreak === 'Break') {
+        setTimerValue(breakLength);
+      } else {
+        setTimerValue(longBreakLength);
+      }
+    }
+
+   
+    
      // Change the document title to display the current time.
      document.title = convertSecondsToMMSS(timerValue);
 
-  }, [timerValue, sessionOrBreak, breakLength]);
+  }, [timerValue, sessionOrBreak, breakLength, sessionLength, longBreakLength]);
  
   // Run the color effects on the elements
   useEffect(() => {
   document.body.style.color = sessionOrBreak === 'Pomodoro' ? '#FF3366' : (sessionOrBreak === 'Break' ? '#9C6EAF' : '#28AFB0');
   document.getElementById('start_stop').style.color = sessionOrBreak === 'Pomodoro' ? '#FF3366' : (sessionOrBreak === 'Break' ? '#9C6EAF' : '#28AFB0');
 
-  const inputs = document.querySelectorAll('input[type="number"]');
-
-// Loop through each input element
-inputs.forEach(input => {
-    // Change color based on condition
-    input.style.color = sessionOrBreak === 'Pomodoro' ? '#FF3366' : '#9C6EAF';
-});
 }, [sessionOrBreak]);
   
   
@@ -165,11 +177,23 @@ inputs.forEach(input => {
           <div id="clock">
             <div id="clock-labels">
               <a class={sessionOrBreak === 'Pomodoro' ? 'label-selected' : 'label-not-selected'} 
-                 onClick={() => setSessionOrBreak("Pomodoro")}><div id="pomodoro-label">Pomodoro</div></a>
+                 onClick={() => {setSessionOrBreak("Pomodoro"); 
+                 if (timerRunning) {
+                  stopTimer();
+                } setTimerValue(sessionLength);
+                }}><div id="pomodoro-label">Pomodoro</div></a>
               <a class={sessionOrBreak === 'Break' ? 'label-selected' : 'label-not-selected'} 
-                 onClick={() => setSessionOrBreak("Break")}><div id="shortBreak-label">Short Break</div></a>
+                 onClick={() => {setSessionOrBreak("Break"); 
+                 if (timerRunning) {
+                  stopTimer();
+                } setTimerValue(breakLength);
+                }}><div id="shortBreak-label">Short Break</div></a>
               <a class={sessionOrBreak === 'longBreak' ? 'label-selected' : 'label-not-selected'}
-                 onClick={() => setSessionOrBreak("longBreak")}><div id="longBreak-label">Long Break</div></a>
+                 onClick={() => {setSessionOrBreak("longBreak"); 
+                 if (timerRunning) {
+                  stopTimer();
+                } setTimerValue(longBreakLength);
+                }}><div id="longBreak-label">Long Break</div></a>
             </div>
           <div id="time-left">{convertSecondsToMMSS(timerValue)}</div>
           <button id="start_stop" onClick={startStopButtonPress}>{startStopButton}</button>
@@ -188,7 +212,7 @@ inputs.forEach(input => {
               breakLength={breakLength}
               setBreakLength={setBreakLength}
               longBreakLength={longBreakLength} 
-              setlongBreakLength={longBreakLength}
+              setlongBreakLength={setlongBreakLength}
               timerRunning={timerRunning}
               sessionOrBreak={sessionOrBreak}
             />}

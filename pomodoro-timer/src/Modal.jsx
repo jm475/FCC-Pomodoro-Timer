@@ -7,13 +7,13 @@ const Modal = ({ showModal, setShowModal, convertSectoMin,
                  breakLength, setBreakLength,longBreakLength, 
                  setlongBreakLength, timerRunning, sessionOrBreak}) => {
     return (
-        <div id="window" className="fixed inset-0 bg-#FF3366 bg-opacity-30 backdrop-blur-sm flex justify-center">
+        <div id="window" className="fixed inset-0 bg-#302E38 bg-opacity-30 backdrop-blur-sm flex justify-center">
             <div className="mt-10 flex flex-col gap-5">
               <button className="place-self-end" onClick={() => setShowModal(false)}><i class="bi bi-x-lg"></i></button>
               <div className="bg-black rounded-xl px-20 py-10 flex flex-col gap-5">
                   
                   <div id="session-section">
-                  <label htmlFor="session-length">Session Length</label>
+                  <label id="session-label" htmlFor="session-length">Session Length</label>
     <input 
       type="number" 
       id="session-length" 
@@ -23,7 +23,7 @@ const Modal = ({ showModal, setShowModal, convertSectoMin,
       max="999" 
       step="1" 
       onChange={(e) => {
-        if(timerRunning === true || sessionOrBreak === 'Break') {
+        if(timerRunning === true) {
           return;
         } 
         let newValue = parseInt(e.target.value);
@@ -40,16 +40,15 @@ const Modal = ({ showModal, setShowModal, convertSectoMin,
 
       onBlur={(e) => {
         if (!e.target.value) {
-          setbreakLength(25 * 60); // Default session length to 25 minutes if input is empty
-          
+          setSessionLength(25 * 60); // Default session length to 25 minutes if input is empty
         }
-      }} // Default session length to 25 if input is empty on blur
+      }} 
       
     />
                   </div>
 
                   <div id="break-section">
-                      <label htmlFor="break-length">Break Length</label>
+                      <label id="break-label" htmlFor="break-length">Break Length</label>
                       <input 
       type="number" 
       id="break-length" 
@@ -59,7 +58,7 @@ const Modal = ({ showModal, setShowModal, convertSectoMin,
       max="999" 
       step="1" 
       onChange={(e) => {
-        if(timerRunning === true || sessionOrBreak === 'Session') {
+        if(timerRunning === true) {
           return;
         } 
         let newValue = parseInt(e.target.value);
@@ -69,16 +68,50 @@ const Modal = ({ showModal, setShowModal, convertSectoMin,
           e.target.value = 5;
         }
 
-        const newBreakLength = parseInt(e.target.value) * 60; // Calculate new break length
-        setBreakLength(newBreakLength); // Update BreakLength state
-        
+        const newbreakLength = parseInt(e.target.value) * 60; // Calculate new break length
+        setBreakLength(newbreakLength); // Update BreakLength state
+        setTimerValue(newbreakLength); // Update timerValue state
       }} 
 
       onBlur={(e) => {
         if (!e.target.value) {
           setBreakLength(5 * 60); // Default break length to 5 minutes if input is empty
         }
-      }} // Default break length to 5 if input is empty on blur
+      }}
+    />
+                  </div>
+
+                  <div id="longbreak-section">
+                      <label id="longbreak-label" htmlFor="longbreak-length">Long Break Length</label>
+                      <input 
+      type="number" 
+      id="longbreak-length" 
+      name="longbreak-length" 
+      value={convertSectoMin(longBreakLength)} // Use longBreakLength variable here
+      min="1" 
+      max="999" 
+      step="1" 
+      onChange={(e) => {
+        if(timerRunning === true) {
+          return;
+        } 
+        let newValue = parseInt(e.target.value);
+        if (newValue > 999) {
+          e.target.value = 999;
+        } else if (newValue < 1) {
+          e.target.value = 10;
+        }
+
+        const newlongBreakLength = parseInt(e.target.value) * 60; // Calculate new break length
+        setlongBreakLength(newlongBreakLength); // Update BreakLength state
+        setTimerValue(newlongBreakLength); // Update timerValue state
+      }} 
+
+      onBlur={(e) => {
+        if (!e.target.value) {
+          setlongBreakLength(10 * 60); // Default break length to 10 minutes if input is empty
+        }
+      }} 
     />
                   </div>
 
