@@ -121,3 +121,20 @@ body {
 #start_stop:active{
   transform: translateY(4px);
 }
+
+
+/* Style for the spotify embed */
+#spotify-player {
+  display: flex;
+  max-width: 50vw;
+  max-height: 30vh;
+  margin: 3rem auto;
+}
+
+
+
+@media (max-width: 670px) {
+  #clock-labels {
+     font-size: 1rem;
+  }
+}

@@ -14,10 +14,11 @@ function App() {
   const [startStopButton, setStartStopButton] = useState('Start');
   const [breakLength, setBreakLength] = useState(300); // Default is 300 seconds
   const [longBreakLength, setlongBreakLength] = useState(600); // Default is 600 seconds
-  const [sessionLength, setSessionLength] = useState(1); // Default is 1500 seconds
+  const [sessionLength, setSessionLength] = useState(1500); // Default is 1500 seconds
   // Three possible values "Pomodoro", "Break", "LongBreak"
   const [sessionOrBreak, setSessionOrBreak] = useState('Pomodoro');
-  const [showModal, setShowModal]= useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [soundOnOff, setsoundOnOff] = useState(true);
   const intervalRef = useRef(null);
   const audio = useRef();
 
@@ -36,46 +37,6 @@ function App() {
   }
  
   
-  // Function to handle increase break length button
-  const increaseBreakLength = () => {
-    if(breakLength >= 3600 || timerRunning === true) {
-       return;
-     }
-    setBreakLength(prevBreakLength => prevBreakLength + 60);
-  }
-  
-  // Function to handle decrease break length button
-   const decreaseBreakLength = () => {
-     if(breakLength <= 60 || timerRunning === true) {
-       return;
-     }
-    setBreakLength(prevBreakLength => prevBreakLength - 60);
-  }
-   
-   
-  // Function to handle increase session length button
-  const increaseSessionLength = () => {
-    if(sessionLength >= 3600 || timerRunning === true || sessionOrBreak === 'Break') {
-       return;
-     }
-    setSessionLength(prevSessionLength => prevSessionLength + 60);
-    setTimerValue(prevTimerValue => prevTimerValue + 60);
-  }
-  
-  
-  // Function to handle decrease session length button
-  const decreaseSessionLength = () => {
-    if(sessionLength <= 60 || timerRunning === true || sessionOrBreak === 'Break') {
-       return;
-     } 
-    setSessionLength(prevSessionLength => prevSessionLength - 60);
-    setTimerValue(prevTimerValue => prevTimerValue - 60);
-
-    // Logging session length
-  console.log(sessionLength);
-  }
-   
- 
   // Function to handle pressing the start/stop button
   const startStopButtonPress = () => {
     if (timerRunning === false) {
@@ -128,17 +89,23 @@ function App() {
   useEffect(() => {
     // If the timer hits zero and the current mode is "Pomodoro"
      if (timerValue === 0 && sessionOrBreak === 'Pomodoro') {
-        stopTimer(); 
-        audio.current.currentTime = 0;
-        audio.current.play();
+        stopTimer();
+        // If the audio is set to on
+        if(soundOnOff) {
+          audio.current.currentTime = 0;
+          audio.current.play();
+        } 
         setSessionOrBreak('Break');
         setTimerValue(breakLength);
         //startTimer();
     // If the timer hits zero and the current mode is "Break"
      } else if(timerValue === 0 && sessionOrBreak === 'Break') {
         stopTimer(); 
-        audio.current.currentTime = 0;
-        audio.current.play();
+        // If the audio is set to on
+        if(soundOnOff) {
+          audio.current.currentTime = 0;
+          audio.current.play();
+        } 
         setSessionOrBreak('Pomodoro');
         setTimerValue(sessionLength);
         //startTimer();
@@ -200,7 +167,6 @@ function App() {
           <div id="clock-buttons">
             <a id="reset" onClick={resetButtonPress}><i class="bi bi-arrow-repeat"></i></a>
             <a id="settings" onClick={() => setShowModal(true)}><i class="bi bi-gear-fill"></i></a>
-            
             {/* Pass props to Modal component */}
             {showModal && <Modal
               showModal={showModal}
@@ -215,11 +181,21 @@ function App() {
               setlongBreakLength={setlongBreakLength}
               timerRunning={timerRunning}
               sessionOrBreak={sessionOrBreak}
+              soundOnOff={soundOnOff}
+              setsoundOnOff={setsoundOnOff}
             />}
           </div>
           
-        </div>
+          </div>
       </div>
+      <iframe
+      id="spotify-player" 
+      src="https://open.spotify.com/embed/playlist/0vvXsWCC9xrXsKd4FyS8kM?utm_source=generator" 
+      width="100%" 
+      height="152"  
+      allowfullscreen="" 
+      allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+      loading="lazy"></iframe>
     </div>
   );
  

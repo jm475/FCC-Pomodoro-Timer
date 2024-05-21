@@ -5,7 +5,16 @@ import App from './App.jsx'
 const Modal = ({ showModal, setShowModal, convertSectoMin, 
                  timerValue, sessionLength, setSessionLength, 
                  breakLength, setBreakLength,longBreakLength, 
-                 setlongBreakLength, timerRunning, sessionOrBreak}) => {
+                 setlongBreakLength, timerRunning, sessionOrBreak,
+                soundOnOff, setsoundOnOff}) => {
+
+const handleChange = () => {
+  setsoundOnOff(!soundOnOff);
+};
+                
+
+
+
     return (
         <div id="window" className="fixed inset-0 bg-#302E38 bg-opacity-30 backdrop-blur-sm flex justify-center">
             <div className="mt-10 flex flex-col gap-5">
@@ -35,7 +44,7 @@ const Modal = ({ showModal, setShowModal, convertSectoMin,
       
         const newSessionLength = parseInt(e.target.value) * 60; // Calculate new session length
         setSessionLength(newSessionLength); // Update sessionLength state
-        setTimerValue(newSessionLength); // Update timerValue state
+        //setTimerValue(newSessionLength); // Update timerValue state
       }} 
 
       onBlur={(e) => {
@@ -114,6 +123,14 @@ const Modal = ({ showModal, setShowModal, convertSectoMin,
       }} 
     />
                   </div>
+
+                  <div id="soundonoff-section">
+                  <label class="switch">
+        <input type="checkbox" checked={soundOnOff} onChange={handleChange}></input>
+        <span class="slider round"></span>
+      </label>
+                  </div>
+
 
 
               </div>
