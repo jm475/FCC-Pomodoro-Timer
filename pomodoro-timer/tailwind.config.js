@@ -5,6 +5,9 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
 ],
   theme: {
+    // colors: {
+    //   myBlack: '#20201f',
+    // },
     extend: {},
   },
   plugins: [],
