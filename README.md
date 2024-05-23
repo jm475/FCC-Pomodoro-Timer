@@ -1,6 +1,10 @@
 # Overview
 This repository contains code for a simple Pomodoro Timer Application built using JavaScript. [What is the Pomodoro Technique?](https://www.techtarget.com/whatis/definition/pomodoro-technique#:~:text=The%20Pomodoro%20Technique%20is%20a,tomato%20(plural%3A%20pomodori).)
 
+[Visit the website here](https://pomodoro-lockin.netlify.app/)
+
+Or if you would like to set it up locally follow the instructions below:
+
 # Setup
 
 Ensure you have the following installed on your local development environment:
@@ -24,15 +28,17 @@ Ensure you have the following installed on your local development environment:
 
 # Features
 - Customizable Work and Break Intervals: Set your preferred durations for work sessions and breaks.
-- Visual Timer: A dynamic display that shows the remaining time for the current session. 
+- Visual Timer: A dynamic display that shows the remaining time for the current session.
+- Spotify Embed: Spotify playlist embed for a Lofi playlist commonly associated with Pomodoro.
 
 
 # Planned Features
-- [ ] Audio Notifications: Get notified with a sound when a session ends.
+- [x] Audio Notifications: Get notified with a sound when a session ends.
 - [ ] Session Counter: Keep track of the number of completed work sessions.
 - [ ] Responsive Design: Works well on both desktop and mobile devices.
-- [ ] Spotify Embed?
+- [x] Spotify Embed
 - [ ] Notifications: To notify when completion of work and break intervals.
+- [ ] Change the logo displayed during work/break modes.
 
 
 # Implementation Details
