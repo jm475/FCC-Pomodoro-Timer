@@ -1,4 +1,4 @@
-import React from "react";
+import {useEffect} from "react";
 import './Modal.css';
 import App from './App.jsx'
 
@@ -6,14 +6,28 @@ const Modal = ({ showModal, setShowModal, convertSectoMin,
                  timerValue, sessionLength, setSessionLength, 
                  breakLength, setBreakLength,longBreakLength, 
                  setlongBreakLength, timerRunning, sessionOrBreak,
-                soundOnOff, setsoundOnOff}) => {
+                soundOnOff, setSoundOnOff}) => {
 
-const handleChange = () => {
-  setsoundOnOff(!soundOnOff);
-};
+  
+/**
+ * Method to handle the slide button 
+ * for turningn the sound when the timer ends on/off
+ */
+  const handleSoundOnOff = () => {
+    setSoundOnOff(!soundOnOff);
+  };
                 
+  // useEffect to save user data when they return to the application
+  useEffect(() => {
+    // Save soundOnOff state to localStorage
+    localStorage.setItem('soundOnOff', JSON.stringify(soundOnOff));
 
+    // Save each length state to localStorage
+    localStorage.setItem('saveSessionLength', JSON.stringify(sessionLength));
+    localStorage.setItem('saveBreakLength', JSON.stringify(breakLength));
+    localStorage.setItem('saveLongBreakLength', JSON.stringify(longBreakLength));
 
+  }, [soundOnOff, sessionLength, breakLength, longBreakLength]);
 
     return (
         <div id="window" className="fixed inset-0 bg-#302E38 bg-opacity-30 backdrop-blur-sm flex justify-center">
@@ -125,8 +139,9 @@ const handleChange = () => {
                   </div>
 
                   <div id="soundonoff-section">
-                  <label class="switch">
-        <input type="checkbox" checked={soundOnOff} onChange={handleChange}></input>
+                  <label>Play Sound When Timer Finishes?</label>
+                  <label class="switch"> 
+        <input type="checkbox" checked={soundOnOff} onChange={handleSoundOnOff}></input>
         <span class="slider round"></span>
       </label>
                   </div>

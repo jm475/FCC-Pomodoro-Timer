@@ -4,11 +4,6 @@ import Modal from './Modal';
 
 
 function App() {
-  /* 
-   There is an issue when in break mode
-   */
-
-  
   const [timerRunning, setTimerRunning] = useState(false);
   const [timerValue, setTimerValue] = useState(1500); // Default is 1500 seconds
   const [startStopButton, setStartStopButton] = useState('Start');
@@ -18,7 +13,7 @@ function App() {
   // Three possible values "Pomodoro", "Break", "LongBreak"
   const [sessionOrBreak, setSessionOrBreak] = useState('Pomodoro');
   const [showModal, setShowModal] = useState(false);
-  const [soundOnOff, setsoundOnOff] = useState(true);
+  const [soundOnOff, setSoundOnOff] = useState(true);
   const intervalRef = useRef(null);
   const audio = useRef();
 
@@ -68,7 +63,7 @@ function App() {
     audio.current.currentTime = 0; // Reset the audio to the start
     //Reset timer values
     if(sessionOrBreak === 'Pomodoro') {
-      setSessionLength(1500);
+      setSessionLength(2500);
       setTimerValue(sessionLength);
     } else if (sessionOrBreak === 'Break') {
       setBreakLength(300);
@@ -97,7 +92,6 @@ function App() {
         } 
         setSessionOrBreak('Break');
         setTimerValue(breakLength);
-        //startTimer();
     // If the timer hits zero and the current mode is "Break"
      } else if(timerValue === 0 && sessionOrBreak === 'Break') {
         stopTimer(); 
@@ -108,7 +102,6 @@ function App() {
         } 
         setSessionOrBreak('Pomodoro');
         setTimerValue(sessionLength);
-        //startTimer();
      }
 
      // If the timer isnt running refresh the timer value
@@ -136,6 +129,29 @@ function App() {
 
 }, [sessionOrBreak]);
   
+
+// Load states from localStorage on initial render
+useEffect(() => {
+  const savedSoundOnOff = localStorage.getItem('soundOnOff');
+  if (savedSoundOnOff !== null) {
+    setSoundOnOff(JSON.parse(savedSoundOnOff));
+  }
+
+  const savedSessionLength = JSON.parse(localStorage.getItem('saveSessionLength'));
+  if (savedSessionLength !== null) {
+    setSessionLength(JSON.parse(savedSessionLength));
+  }
+
+  const savedBreakLength = JSON.parse(localStorage.getItem('saveBreakLength'));
+  if (savedBreakLength !== null) {
+    setBreakLength(JSON.parse(savedBreakLength));
+  }
+
+  const savedLongBreakLength = JSON.parse(localStorage.getItem('saveLongBreakLength'));
+  if (savedLongBreakLength !== null) {
+    setlongBreakLength(JSON.parse(savedLongBreakLength));
+  }
+}, []);
   
   return (
     <div id="app">
@@ -182,7 +198,7 @@ function App() {
               timerRunning={timerRunning}
               sessionOrBreak={sessionOrBreak}
               soundOnOff={soundOnOff}
-              setsoundOnOff={setsoundOnOff}
+              setSoundOnOff={setSoundOnOff}
             />}
           </div>
           
