@@ -30,6 +30,7 @@ Ensure you have the following installed on your local development environment:
 - Customizable Work and Break Intervals: Set your preferred durations for work sessions and breaks.
 - Visual Timer: A dynamic display that shows the remaining time for the current session.
 - Spotify Embed: Spotify playlist embed for a Lofi playlist commonly associated with Pomodoro.
+- Saving User Data: Uses local storage to save user data.
 
 
 # Planned Features
