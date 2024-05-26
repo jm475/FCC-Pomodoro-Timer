@@ -43,7 +43,6 @@ Ensure you have the following installed on your local development environment:
 
 
 # Implementation Details
-## Implementation Details
 
 - **Languages**: JavaScript
 - **Framework**: React
